@@ -4,10 +4,10 @@ from pyModbusTCP.client import ModbusClient #Biblioteca Modbus
 from time import sleep #Comando para delay
 import os #Biblioteca para limpar a tela
 
-client=ModbusClient(host="192.168.0.7", port=8899)
+client=ModbusClient(host="192.168.1.7", port=8899)
 try:
     print('Client starting...')
-    client.unit_id(0)
+    client.unit_id(10)
     client.open()
     print('Client is online.')
     while True:

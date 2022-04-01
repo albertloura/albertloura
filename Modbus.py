@@ -1,26 +1,28 @@
-# Modbus Client
-from ast import Continue
-from pyModbusTCP.client import ModbusClient #Biblioteca Modbus
-from time import sleep #Comando para delay
-import os #Biblioteca para limpar a tela
+from pyModbusTCP.client import ModbusClient as Modbus
+client = Modbus(host='192.168.1.7', port=8899, unit_id=10)
+client.open()
 
-client=ModbusClient(host="192.168.1.7", port=8899)
+consumoKW=potkvarh=voltage=current=activepower=powerfactor=frequency=0
+
 try:
-    print('Client starting...')
-    client.unit_id(10)
-    client.open()
-    print('Client is online.')
-    while True:
-        os.system('cls') or None
-        pot=client.read_holding_registers(1,1)
-        ten=client.read_holding_registers(22,1)
-        cor=client.read_holding_registers(25,1)
-        print(f'Potência consumida: {pot[0]/100}W')
-        print(f'Tensão elétrica: {ten[0]/10}V')
-        print(f'Corrente elétrica: {cor[0]/100}A')
-        sleep(1)
-        Continue
-except:
-    print('Client closing...')
-    client.close()
-    print('Client is offline.')
+    lerDadosMbus=client.read_holding_registers(0,50)
+    consumoKW=(float((str(lerDadosMbus[0] << 8)) + str(lerDadosMbus[1])))/100
+    potkvarh=(float((str(lerDadosMbus[12] << 8)) + str(lerDadosMbus[13])))/100
+    voltage=(float(lerDadosMbus[22]))/10
+    current=(float(lerDadosMbus[25]))/100
+    activepower=(float(lerDadosMbus[30]))/1000
+    powerfactor=(float(lerDadosMbus[43]))/1000
+    frequency=(float(lerDadosMbus[17]))/100
+except:    
+    print('Erro leitura modbus')
+
+
+client.close()
+
+print(f'{consumoKW} kWh')
+print(f'{potkvarh} kvarh')
+print(f'{voltage} V')
+print(f'{current} A')
+print(f'{activepower} kW')
+print(f'{powerfactor} ')
+print(f'{frequency} Hz')
